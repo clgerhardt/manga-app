@@ -32,6 +32,7 @@ func main() {
 	collectionsGroup := router.Group("collections")
 	{
 		collectionsGroup.GET("index", routes.CollectionsIndex)
+		collectionsGroup.POST("create", authMiddleWare(), routes.CollectionsCreate)
 	}
 
 	router.Run(":8080")
@@ -56,7 +57,6 @@ func dbMiddleware(conn pgx.Conn) gin.HandlerFunc {
 func authMiddleWare() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		bearer := c.Request.Header.Get("Authorization")
-		// Bearer asdfadsfadsfs
 		split := strings.Split(bearer, "Bearer ")
 		if len(split) < 2 {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Not authenticated."})
