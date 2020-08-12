@@ -33,6 +33,8 @@ func main() {
 	{
 		collectionsGroup.GET("index", routes.CollectionsIndex)
 		collectionsGroup.POST("create", authMiddleWare(), routes.CollectionsCreate)
+		collectionsGroup.DELETE("delete", authMiddleWare(), routes.CollectionsDelete)
+		collectionsGroup.PUT("update", authMiddleWare(), routes.CollectionsUpdate)
 	}
 
 	router.Run(":8080")
