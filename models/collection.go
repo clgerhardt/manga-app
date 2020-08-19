@@ -41,6 +41,27 @@ func GetAllCollections(conn *pgx.Conn) ([]Collection, error) {
 	return collections, nil
 }
 
+func (i *Collection) GetAllChapters(conn *pgx.Conn) ([]Chapter, error) {
+	rows, err := conn.Query(context.Background(), "SELECT id, title, description, number_of_pages, chapter_number, collection_id, created_at, updated_at FROM chapter WHERE collection_id=$1", i.ID)
+	if err != nil {
+		fmt.Println(err)
+		return nil, fmt.Errorf("Error getting collections")
+	}
+
+	var chapters []Chapter
+	for rows.Next() {
+		chapter := Chapter{}
+		err = rows.Scan(&chapter.ID, &chapter.Title, &chapter.Description, &chapter.NumberOfPages, &chapter.ChapterNumber, &chapter.CollectionID, &chapter.CreatedAt, &chapter.UpdatedAt)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		chapters = append(chapters, chapter)
+	}
+
+	return chapters, nil
+}
+
 func (i *Collection) Create(conn *pgx.Conn, userID string) error {
 	i.Title = strings.Trim(i.Title, " ")
 	if len(i.Title) < 1 {

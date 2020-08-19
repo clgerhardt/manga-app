@@ -33,6 +33,11 @@ func main() {
 	{
 		collectionsGroup.GET("index", routes.CollectionsIndex)
 		collectionsGroup.POST("create", authMiddleWare(), routes.CollectionsCreate)
+		collectionsGroup.GET("get_collection_chapters", routes.CollectionsChapters)
+	}
+	chaptersGroup := router.Group("chapters")
+	{
+		chaptersGroup.POST("create", authMiddleWare(), routes.ChaptersCreate)
 	}
 
 	router.Run(":8080")

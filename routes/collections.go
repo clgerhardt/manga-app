@@ -99,3 +99,16 @@ func CollectionsDelete(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"collection": "collection deleted"})
 }
+
+func CollectionsChapters(c *gin.Context) {
+	db, _ := c.Get("db")
+	conn := db.(pgx.Conn)
+
+	collection := models.Collection{}
+	c.ShouldBindJSON(&collection)
+	chapters, err := collection.GetAllChapters(&conn)
+	if err != nil {
+		fmt.Println(err)
+	}
+	c.JSON(http.StatusOK, gin.H{"chapters": chapters})
+}

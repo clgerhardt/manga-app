@@ -22,7 +22,7 @@ CREATE TABLE chapter (
     title VARCHAR(255) NOT NULL,
     description TEXT,
     number_of_pages INTEGER,
-    chapter_numer INTEGER,
+    chapter_number INTEGER,
     collection_id uuid,
     FOREIGN KEY (collection_id) REFERENCES "collection"(id)
 ) INHERITS (base_table);
