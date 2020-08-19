@@ -33,11 +33,15 @@ func main() {
 	{
 		collectionsGroup.GET("index", routes.CollectionsIndex)
 		collectionsGroup.POST("create", authMiddleWare(), routes.CollectionsCreate)
+		collectionsGroup.POST("update", authMiddleWare(), routes.CollectionsUpdate)
+		collectionsGroup.POST("delete", authMiddleWare(), routes.CollectionsDelete)
 		collectionsGroup.GET("get_collection_chapters", routes.CollectionsChapters)
 	}
 	chaptersGroup := router.Group("chapters")
 	{
 		chaptersGroup.POST("create", authMiddleWare(), routes.ChaptersCreate)
+		chaptersGroup.POST("update", authMiddleWare(), routes.ChaptersUpdate)
+		chaptersGroup.POST("delete", authMiddleWare(), routes.ChaptersDelete)
 	}
 
 	router.Run(":8080")
