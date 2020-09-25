@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
+// CollectionsIndex is the route for handling returning all the collections
 func CollectionsIndex(c *gin.Context) {
 	db, _ := c.Get("db")
 	conn := db.(pgx.Conn)
@@ -19,6 +20,7 @@ func CollectionsIndex(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"collections": collections})
 }
 
+// CollectionsCreate is the route for handling creation of a collection
 func CollectionsCreate(c *gin.Context) {
 	userID := c.GetString("user_id")
 	db, _ := c.Get("db")
@@ -34,6 +36,7 @@ func CollectionsCreate(c *gin.Context) {
 	c.JSON(http.StatusOK, collection)
 }
 
+// CollectionsUpdate is the route for handling the updating of a collection
 func CollectionsUpdate(c *gin.Context) {
 	userID := c.GetString("user_id")
 	db, _ := c.Get("db")
@@ -67,6 +70,7 @@ func CollectionsUpdate(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"item": collectionSent})
 }
 
+// CollectionsDelete is the route for handling the deletion of a collection
 func CollectionsDelete(c *gin.Context) {
 	userID := c.GetString("user_id")
 	db, _ := c.Get("db")
@@ -100,6 +104,7 @@ func CollectionsDelete(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"collection": "collection deleted"})
 }
 
+// CollectionsChapters is the route for handling return of all the chapters under this collection
 func CollectionsChapters(c *gin.Context) {
 	db, _ := c.Get("db")
 	conn := db.(pgx.Conn)

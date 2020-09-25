@@ -21,7 +21,7 @@ func main() {
 	}
 
 	router := gin.Default()
-
+	router.Use(CORS())
 	router.Use(dbMiddleware(*conn))
 
 	usersGroup := router.Group("users")
@@ -33,18 +33,23 @@ func main() {
 	{
 		collectionsGroup.GET("index", routes.CollectionsIndex)
 		collectionsGroup.POST("create", authMiddleWare(), routes.CollectionsCreate)
-		collectionsGroup.POST("update", authMiddleWare(), routes.CollectionsUpdate)
-		collectionsGroup.POST("delete", authMiddleWare(), routes.CollectionsDelete)
+		collectionsGroup.PUT("update", authMiddleWare(), routes.CollectionsUpdate)
+		collectionsGroup.DELETE("delete", authMiddleWare(), routes.CollectionsDelete)
 		collectionsGroup.GET("get_collection_chapters", routes.CollectionsChapters)
 	}
 	chaptersGroup := router.Group("chapters")
 	{
 		chaptersGroup.POST("create", authMiddleWare(), routes.ChaptersCreate)
-		chaptersGroup.POST("update", authMiddleWare(), routes.ChaptersUpdate)
-		chaptersGroup.POST("delete", authMiddleWare(), routes.ChaptersDelete)
+		chaptersGroup.PUT("update", authMiddleWare(), routes.ChaptersUpdate)
+		chaptersGroup.DELETE("delete", authMiddleWare(), routes.ChaptersDelete)
+		chaptersGroup.POST("get_chapter_pages", CORS(), routes.ChaptersPages)
 	}
 
-	router.Run(":8080")
+	pagesGroup := router.Group("pages")
+	{
+		pagesGroup.POST("create", authMiddleWare(), routes.PagesCreate)
+	}
+	router.Run(":8000")
 }
 
 func connectDB() (c *pgx.Conn, err error) {
@@ -54,6 +59,22 @@ func connectDB() (c *pgx.Conn, err error) {
 	}
 	_ = conn.Ping(context.Background())
 	return conn, err
+}
+
+func CORS() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
 }
 
 func dbMiddleware(conn pgx.Conn) gin.HandlerFunc {

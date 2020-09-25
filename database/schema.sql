@@ -32,5 +32,6 @@ CREATE TABLE page (
     page BYTEA,
     title VARCHAR(255) NOT NULL,
     chapter_id uuid,
+    order_number INTEGER NOT NULL,
     FOREIGN KEY (chapter_id) REFERENCES "chapter"(id)
 ) INHERITS (base_table);

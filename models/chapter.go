@@ -2,29 +2,31 @@ package models
 
 import (
 	"fmt"
-	"time"
 	"strings"
+	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/jackc/pgx/v4"
 	"golang.org/x/net/context"
 )
 
+// Chapter struct defines the chapter objects
 type Chapter struct {
-	ID                   uuid.UUID `json:"id"`
-	CreatedAt            time.Time `json:"_"`
-	UpdatedAt            time.Time `json:"_"`
-	Title                string    `json:"title"`
-	Description          string    `json:"description"`
-	NumberOfPages        int64     `json:"number_of_pages"`
-	ChapterNumber        int64     `json:"chapter_number"`
-	CollectionID         uuid.UUID `json:"chapter"`
+	ID            uuid.UUID `json:"id"`
+	CreatedAt     time.Time `json:"_"`
+	UpdatedAt     time.Time `json:"_"`
+	Title         string    `json:"title"`
+	Description   string    `json:"description"`
+	NumberOfPages int64     `json:"number_of_pages"`
+	ChapterNumber int64     `json:"chapter_number"`
+	CollectionID  uuid.UUID `json:"collection"`
 }
 
+// Create chapter method
 func (i *Chapter) Create(conn *pgx.Conn) error {
 	i.Title = strings.Trim(i.Title, " ")
 	if len(i.Title) < 1 {
-		return fmt.Errorf("Title must not be empty.")
+		return fmt.Errorf("Title must not be empty")
 	}
 
 	now := time.Now()
@@ -40,6 +42,7 @@ func (i *Chapter) Create(conn *pgx.Conn) error {
 	return nil
 }
 
+// Update chapter method
 func (i *Chapter) Update(conn *pgx.Conn) error {
 	i.Title = strings.Trim(i.Title, " ")
 	if len(i.Title) < 1 {
@@ -57,7 +60,8 @@ func (i *Chapter) Update(conn *pgx.Conn) error {
 	return nil
 }
 
-func FindChapterById(id uuid.UUID, conn *pgx.Conn) (Chapter, error) {
+// FindChapterByID method
+func FindChapterByID(id uuid.UUID, conn *pgx.Conn) (Chapter, error) {
 	row := conn.QueryRow(context.Background(), "SELECT title, description, number_of_pages, chapter_number, collection_id FROM chapter WHERE id=$1", id)
 	chapter := Chapter{
 		ID: id,
@@ -70,6 +74,7 @@ func FindChapterById(id uuid.UUID, conn *pgx.Conn) (Chapter, error) {
 	return chapter, nil
 }
 
+// Delete chapter method
 func (i *Chapter) Delete(conn *pgx.Conn) error {
 	_, err := conn.Exec(context.Background(), "DELETE FROM chapter WHERE id=$5", i.ID)
 
@@ -79,4 +84,26 @@ func (i *Chapter) Delete(conn *pgx.Conn) error {
 	}
 
 	return nil
+}
+
+// GetAllPages chapter method
+func (i *Chapter) GetAllPages(conn *pgx.Conn) ([]Page, error) {
+	rows, err := conn.Query(context.Background(), "SELECT id, title, page, chapter_id, order_number, created_at, updated_at FROM page WHERE chapter_id=$1 ORDER BY order_number ASC", i.ID)
+	if err != nil {
+		fmt.Println(err)
+		return nil, fmt.Errorf("Error getting collections")
+	}
+
+	var pages []Page
+	for rows.Next() {
+		page := Page{}
+		err = rows.Scan(&page.ID, &page.Title, &page.Page, &page.ChapterID, &page.OrderNumber, &page.CreatedAt, &page.UpdatedAt)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		pages = append(pages, page)
+	}
+
+	return pages, nil
 }

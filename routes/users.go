@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
+// UsersLogin in the route for handling user login
 func UsersLogin(c *gin.Context) {
 	user := models.User{}
 	err := c.ShouldBindJSON(&user)
@@ -36,6 +37,7 @@ func UsersLogin(c *gin.Context) {
 	})
 }
 
+// UsersRegister is the route for handling new user registration
 func UsersRegister(c *gin.Context) {
 	user := models.User{}
 	err := c.ShouldBindJSON(&user)
